@@ -73,14 +73,14 @@ function error(string $message){
 
 function BuilPhar(string $label, array $opts): Generator {
     $start = microtime(true);
-    $config = file_exists(getcwd()."\Config.json") ? json_decode(file_get_contents(getcwd()."\Config.json"), true) : ["ignore-files" => [".idea", ".gitignore", "composer.json", "composer.lock", "make-phar.php", ".git", "composer.phar"], "show-path" => true];
+    $config = file_exists(getcwd()."\Config.json") ? json_decode(file_get_contents(getcwd()."\Config.json"), true) : ["ignore-files" => [".idea", ".gitignore", "composer.json", "composer.lock", ".git", "composer.phar"], "show-path" => true, "input" => "", "output" => ""];
     if(!isset($opts['name']) or ($name = $opts['name']) === ""){
         yield colors("RED")."Usage: {$label} <directory> [override: y|n]";
         return;
     }
-    $result = getcwd().DIRECTORY_SEPARATOR."Result";
+    $result = ($config['output'] === "" ? $config['output'] : getcwd().DIRECTORY_SEPARATOR."Result");
     $result .= DIRECTORY_SEPARATOR;
-    $input = getcwd().DIRECTORY_SEPARATOR."Input";
+    $input = ($config['input'] === "" ? $config['input'] : getcwd().DIRECTORY_SEPARATOR."Input");
     $input .= DIRECTORY_SEPARATOR;
     $request = $input.$name;
     if(!is_dir($request)){
@@ -155,13 +155,16 @@ function BuilPhar(string $label, array $opts): Generator {
 
 function unPhar(string $label, array $args): Generator{
     $start = microtime(true);
-    $config = file_exists(getcwd()."\Config.json") ? json_decode(file_get_contents(getcwd()."\Config.json"), true) : ["ignore-files" => [".idea", ".gitignore", "composer.json", "composer.lock", "make-phar.php", ".git", "composer.phar"], "show-path" => true];
+    $config = file_exists(getcwd()."\Config.json") ? json_decode(file_get_contents(getcwd()."\Config.json"), true) : ["ignore-files" => [".idea", ".gitignore", "composer.json", "composer.lock", ".git", "composer.phar"], "show-path" => true, "input" => "", "output" => ""];
     if(!isset($args['name']) or ($name = $args['name']) === ""){
         yield colors("RED")."Usage: {$label} <file> [override: y|n]";
         return;
     }
-    $folderPath = getcwd().DIRECTORY_SEPARATOR."Input".DIRECTORY_SEPARATOR.$name.".phar";
-    $result = getcwd().DIRECTORY_SEPARATOR."Result".DIRECTORY_SEPARATOR.$name;
+    $result = ($config['output'] === "" ? $config['output'] : getcwd().DIRECTORY_SEPARATOR."Result").DIRECTORY_SEPARATOR.$name;
+    $folderPath = ($config['input'] === "" ? $config['input'] : getcwd().DIRECTORY_SEPARATOR."Input").DIRECTORY_SEPARATOR.$name.".phar";
+
+    //$folderPath = getcwd().DIRECTORY_SEPARATOR."Input".DIRECTORY_SEPARATOR.$name.".phar";
+    //$result = getcwd().DIRECTORY_SEPARATOR."Result".DIRECTORY_SEPARATOR.$name;
     if(!file_exists($folderPath)){
         return yield "e>;$name.phar does not exist";
     }
@@ -247,10 +250,25 @@ function main(): Generator{
 }
 
 function load(){
-    if(!file_exists(getcwd()."\Config.json"))file_put_contents(getcwd()."\Config.json", json_encode(["ignore-files" => [".idea", ".gitignore", "composer.json", "composer.lock", "make-phar.php", ".git", "composer.phar"], "show-path" => true]));
-    foreach(["Result", "Input"] as $path){
-        if(!is_dir(getcwd()."/$path") && !mkdir(getcwd()."/$path")){
-            error("An error occurred while creating {$path} directory");
+    if(!file_exists(getcwd()."\Config.json"))file_put_contents(getcwd()."\Config.json", json_encode(["ignore-files" => [".idea", ".gitignore", "composer.json", "composer.lock", ".git", "composer.phar"], "show-path" => true, "input" => "", "output" => ""]));
+    $config = file_exists(getcwd()."\Config.json") ? json_decode(file_get_contents(getcwd()."\Config.json"), true) : ["ignore-files" => [".idea", ".gitignore", "composer.json", "composer.lock", ".git", "composer.phar"], "show-path" => true, "input" => "", "output" => ""];
+    $result = ($config['output'] !== "" ? $config['output'] : getcwd().DIRECTORY_SEPARATOR."Result");
+    $input = ($config['input'] !== "" ? $config['input'] : getcwd().DIRECTORY_SEPARATOR."Input");
+    if(getcwd().DIRECTORY_SEPARATOR."Result" === $result){
+        if(!is_dir($result) && !mkdir($result)){
+            error("An error occurred while creating {$result} directory");
+            exit(1);
+        }
+    }
+    if(getcwd().DIRECTORY_SEPARATOR."Input" === $input){
+        if(!is_dir($input) && !mkdir($input)){
+            error("An error occurred while creating {$input} directory");
+            exit(1);
+        }
+    }
+    foreach([$result, $input] as $path){
+        if(!is_dir($path)){
+            error("Folder {$path} not found");
             exit(1);
         }
     }

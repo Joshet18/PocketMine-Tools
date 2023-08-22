@@ -1,0 +1,6 @@
+{
+    "ignore-files": [".idea",".gitignore","composer.json","composer.lock","make-phar.php",".git","composer.phar"],
+    "show-path":true,
+    "input": "",
+    "output": ""
+}
