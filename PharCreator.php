@@ -146,7 +146,7 @@ function BuilPhar(string $label, array $opts): Generator {
     yield colors("GRAY").str_repeat("--", 30);
     yield colors("LIGHT-PURPLE")."Phar Build success, {$count} files, done in ".round(microtime(true) - $start, 1)."s";
     yield colors("GRAY").str_repeat("--", 30);
-    $phar->compressFiles(Phar::GZ | Phar::ZIP);
+    $phar->compressFiles(Phar::GZ);
     $phar->stopBuffering();
     yield colors("GOLD")."Plugin.yml Info".colors("DARK-GRAY").":";
     foreach($array as $k => $v)yield colors("PURPLE").$k.colors("DARK-GRAY").":".colors("").$v;
