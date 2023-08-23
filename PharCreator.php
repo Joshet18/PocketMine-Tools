@@ -78,9 +78,9 @@ function BuilPhar(string $label, array $opts): Generator {
         yield colors("RED")."Usage: {$label} <directory> [override: y|n]";
         return;
     }
-    $result = ($config['output'] === "" ? $config['output'] : getcwd().DIRECTORY_SEPARATOR."Result");
+    $result = ($config['output'] !== "" ? $config['output'] : getcwd().DIRECTORY_SEPARATOR."Result");
     $result .= DIRECTORY_SEPARATOR;
-    $input = ($config['input'] === "" ? $config['input'] : getcwd().DIRECTORY_SEPARATOR."Input");
+    $input = ($config['input'] !== "" ? $config['input'] : getcwd().DIRECTORY_SEPARATOR."Input");
     $input .= DIRECTORY_SEPARATOR;
     $request = $input.$name;
     if(!is_dir($request)){
@@ -146,7 +146,7 @@ function BuilPhar(string $label, array $opts): Generator {
     yield colors("GRAY").str_repeat("--", 30);
     yield colors("LIGHT-PURPLE")."Phar Build success, {$count} files, done in ".round(microtime(true) - $start, 1)."s";
     yield colors("GRAY").str_repeat("--", 30);
-    $phar->compressFiles(Phar::GZ);
+    $phar->compressFiles(Phar::GZ | Phar::ZIP);
     $phar->stopBuffering();
     yield colors("GOLD")."Plugin.yml Info".colors("DARK-GRAY").":";
     foreach($array as $k => $v)yield colors("PURPLE").$k.colors("DARK-GRAY").":".colors("").$v;
@@ -160,8 +160,8 @@ function unPhar(string $label, array $args): Generator{
         yield colors("RED")."Usage: {$label} <file> [override: y|n]";
         return;
     }
-    $result = ($config['output'] === "" ? $config['output'] : getcwd().DIRECTORY_SEPARATOR."Result").DIRECTORY_SEPARATOR.$name;
-    $folderPath = ($config['input'] === "" ? $config['input'] : getcwd().DIRECTORY_SEPARATOR."Input").DIRECTORY_SEPARATOR.$name.".phar";
+    $result = ($config['output'] !== "" ? $config['output'] : getcwd().DIRECTORY_SEPARATOR."Result").DIRECTORY_SEPARATOR.$name;
+    $folderPath = ($config['input'] !== "" ? $config['input'] : getcwd().DIRECTORY_SEPARATOR."Input").DIRECTORY_SEPARATOR.$name.".phar";
 
     //$folderPath = getcwd().DIRECTORY_SEPARATOR."Input".DIRECTORY_SEPARATOR.$name.".phar";
     //$result = getcwd().DIRECTORY_SEPARATOR."Result".DIRECTORY_SEPARATOR.$name;
