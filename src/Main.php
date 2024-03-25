@@ -38,8 +38,8 @@ class Main{
 		$this->main_logger->info("Starting PocketMineTools in version v".self::VERSION);
 		($config = $this->config = new Config($this->getDataPath()."Config.json", Config::DETECT, ["show-path" => true, "debug" => false, "input" => "", "output" => "", "ignore-files" => []]));
 		$this->main_logger->setLogDebug((bool)$config->getNested('debug',false));
-		$this->input = ((($value = $config->getNested('output',''))===''?$this->getDataPath()."Input":$value));
-		$this->ouput = ((($value = $config->getNested('input',''))===''?$this->getDataPath()."Result":$value));
+		$this->input = ((($value = $config->getNested('input',''))===''?$this->getDataPath()."Input":$value));
+		$this->ouput = ((($value = $config->getNested('output',''))===''?$this->getDataPath()."Result":$value));
 		foreach([$this->input,$this->ouput] as $dir){
 			if(!is_dir($dir) && in_array($dir, [$this->getDataPath()."Result",$this->getDataPath()."Input"])){
 				if(!mkdir($dir)){
